@@ -25,6 +25,17 @@
     return [fileManager copyItemAtPath:src toPath:dest error:nil];
 }
 
+- (NSString *) getLocalStorageFilePath
+{
+    NSString * userScheme = [self.commandDelegate.settings objectForKey:[@"scheme" lowercaseString]];
+    NSString * scheme = userScheme ? userScheme : @"app";
+
+    NSString * userHostname = [self.commandDelegate.settings objectForKey:[@"hostname" lowercaseString]];
+    NSString * hostname = userHostname ? userHostname : @"localhost";
+
+    return [NSString stringWithFormat:@"WebsiteData/LocalStorage/%@_%@_0.localstorage", scheme, hostname];
+}
+
 - (void) migrateLocalStorage
 {
     // Migrate UIWebView local storage files to WKWebView. Adapted from
@@ -49,7 +60,7 @@
     target = [target stringByAppendingPathComponent:bundleIdentifier];
 #endif
 
-    target = [target stringByAppendingPathComponent:@"WebsiteData/LocalStorage/ionic_localhost_0.localstorage"];
+    target = [target stringByAppendingPathComponent:[self getLocalStorageFilePath]];
 
     // Only copy data if no existing localstorage data exists yet for wkwebview
     if (![[NSFileManager defaultManager] fileExistsAtPath:target]) {
